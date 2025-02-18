@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Danh sách sách</h1>
+<ul class="list-group">
+    {% for book in books %}
+    <li class="list-group-item">
+        <a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a> - {{ book.author }} - {{ book.price }}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

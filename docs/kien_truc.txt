@@ -1,0 +1,41 @@
+ecommerce_project/
+├── manage.py
+├── ecommerce_project/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── book/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── book/
+│           ├── book_list.html
+│           └── book_detail.html
+├── customer/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── customer/
+│           ├── profile.html
+│           └── update_profile.html
+└── cart/
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── views.py
+    ├── urls.py
+    └── templates/
+        └── cart/
+            └── cart.html
+

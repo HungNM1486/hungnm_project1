@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Giỏ hàng của bạn</h1>
+{% if cart_items %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.book.title }}</td>
+                <td>
+                    <form method="post" action="{% url 'update_cart' item.book.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 80px;">
+                        <button type="submit" class="btn btn-sm btn-info mt-1">Cập nhật</button>
+                    </form>
+                </td>
+                <td>{{ item.book.price }}</td>
+                <td>
+                    <a href="{% url 'remove_from_cart' item.book.id %}" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="font-weight-bold">Tổng: {{ total }}</p>
+    <a href="{% url 'clear_cart' %}" class="btn btn-warning">Xóa toàn bộ giỏ hàng</a>
+{% else %}
+    <p>Giỏ hàng của bạn trống.</p>
+{% endif %}
+{% endblock %}
