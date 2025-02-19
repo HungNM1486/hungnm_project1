@@ -1,27 +1,219 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>E-commerce Website</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Thiên đường sách trực tuyến</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #2A2A2A;
+            --accent-color: #FF6B6B;
+            --background-color: #F8F9FA;
+            --text-color: #2A2A2A;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary-color) !important;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-accent {
+            color: var(--accent-color);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--primary-color) !important;
+            margin: 0 1rem;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn-custom {
+            background: var(--accent-color);
+            color: white !important;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .user-greeting {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            min-width: 200px;
+            padding: 1rem;
+            z-index: 1000;
+        }
+
+        .user-greeting:hover .user-menu {
+            display: block;
+        }
+
+        .user-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu a:hover {
+            background: var(--background-color);
+            padding-left: 1.5rem;
+        }
+
+        .container-main {
+            flex: 1;
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-collapse {
+                background: white;
+                padding: 1rem;
+                margin-top: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="{% url 'book_list' %}">Sách</a>
-    <div class="collapse navbar-collapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'customer_profile' %}">Hồ sơ</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'cart' %}">Giỏ hàng</a></li>
-        </ul>
-    </div>
-    {% if user.is_authenticated %}
-        <p>Xin chào, {{ user.username }} | <a href="{% url 'logout' %}">Đăng xuất</a></p>
-    {% else %}
-        <a href="{% url 'login' %}">Đăng nhập</a> | <a href="{% url 'register' %}">Đăng ký</a>
-    {% endif %}
-</nav>
-<div class="container mt-4">
-    {% block content %}
-    {% endblock %}
-</div>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'book_list' %}">Book<span class="brand-accent">Store</span></a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="fas fa-user me-1"></i>Tài khoản
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link cart-icon" href="{% url 'cart' %}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge">3</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <div class="user-greeting me-3">
+                            <span class="btn btn-custom">
+                                <i class="fas fa-user-circle me-2"></i>{{ user.username }}
+                            </span>
+                            <div class="user-menu">
+                                <a href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Hồ sơ</a>
+                                <hr>
+                                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-custom me-2" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+                        </a>
+                        <a class="btn btn-outline-secondary" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus me-2"></i>Đăng ký
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container container-main mt-5">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

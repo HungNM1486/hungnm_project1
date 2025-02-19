@@ -1,6 +1,8 @@
 from django.db import models
 from customer.models import CustomerProfile
 from book.models import Book
+from decimal import Decimal
+from bson.decimal128 import Decimal128  # Import Decimal128 từ MongoDB
 
 class Cart(models.Model):
     customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE)
@@ -27,7 +29,8 @@ class Cart(models.Model):
             pass
 
     def get_total(self):
-        return sum(item.quantity * item.book.price for item in self.cartitem_set.all())
+        # Chuyển đổi book.price từ Decimal128 (MongoDB) sang Decimal (Python)
+        return sum(item.quantity * Decimal(item.book.price.to_decimal()) for item in self.cartitem_set.all())
 
     def clear(self):
         self.cartitem_set.all().delete()

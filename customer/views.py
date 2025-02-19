@@ -1,43 +1,62 @@
-from django.views.generic import TemplateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from .models import CustomerProfile
-from .forms import CustomerProfileForm, RegisterForm
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import login
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from customer.models import CustomerProfile
+from customer.forms import RegisterForm, LoginForm, CustomerProfileForm
 
-
-class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = 'customer/profile.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['profile'] = CustomerProfile.objects.get(user=self.request.user)
-        return context
-
-class UpdateProfileView(LoginRequiredMixin, UpdateView):
-    model = CustomerProfile
-    form_class = CustomerProfileForm
-    template_name = 'customer/update_profile.html'
-    success_url = reverse_lazy('customer_profile')
-    
-    def get_object(self):
-        return CustomerProfile.objects.get(user=self.request.user)
-    
-class CustomLoginView(LoginView):
-    template_name = 'customer/login.html'
-
-def register(request):
-    if request.method == 'POST':
+def register_view(request):
+    if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            login(request, user)
-            return redirect('/')
+            form.save()
+            return redirect("login")  # Chuyển hướng sau khi đăng ký thành công
     else:
         form = RegisterForm()
-    
-    return render(request, 'customer/register.html', {'form': form})    
+    return render(request, "customer/register.html", {"form": form})
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]  # Lấy tên đăng nhập từ form
+            password = form.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("profile")  # Chuyển hướng đến trang cá nhân
+            else:
+                form.add_error(None, "Tên đăng nhập hoặc mật khẩu không đúng")
+    else:
+        form = LoginForm()
+    return render(request, "customer/login.html", {"form": form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+@login_required
+def profile_view(request):
+    # Sử dụng get_or_create để lấy CustomerProfile, nếu chưa có thì tạo mới
+    profile, created = CustomerProfile.objects.get_or_create(user=request.user)
+    if request.method == "POST":
+        form = CustomerProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = CustomerProfileForm(instance=profile)
+    return render(request, "customer/profile.html", {"form": form, "profile": profile})
+
+
+@login_required
+def update_profile(request):
+    profile = CustomerProfile.objects.get(user=request.user)
+    if request.method == "POST":
+        form = CustomerProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")  # Chuyển hướng về trang hồ sơ cá nhân sau cập nhật
+    else:
+        form = CustomerProfileForm(instance=profile)
+    return render(request, "customer/update_profile.html", {"form": form})

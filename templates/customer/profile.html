@@ -1,10 +1,154 @@
 {% extends "base.html" %}
+{% load static %} <!-- Thêm dòng này -->
+
 
 {% block content %}
-<h1>Hồ sơ khách hàng</h1>
-<p><strong>Tên người dùng:</strong> {{ profile.user.username }}</p>
-<p><strong>Email:</strong> {{ profile.user.email }}</p>
-<p><strong>Số điện thoại:</strong> {{ profile.phone_number }}</p>
-<p><strong>Địa chỉ:</strong> {{ profile.address }}</p>
-<a href="{% url 'update_profile' %}" class="btn btn-secondary">Cập nhật hồ sơ</a>
+<main class="container container-main">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-white py-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <h2 class="h3 mb-0"><i class="fas fa-user-circle text-primary me-2"></i>Thông tin cá nhân</h2>
+            <a href="{% url 'update_profile' %}" class="btn btn-custom px-4">
+              <i class="fas fa-edit me-2"></i>Cập nhật
+            </a>
+          </div>
+        </div>
+        
+        <div class="card-body p-5">
+          <div class="row align-items-center mb-5">
+            <div class="col-md-4 text-center mb-4 mb-md-0">
+              <div class="avatar-wrapper">
+                <img src="{% static 'avt.jpg' %}" 
+                     class="rounded-circle shadow-sm" 
+                     alt="Avatar"
+                     width="150"
+                     height="150">
+                <button class="btn btn-sm btn-custom avatar-edit-btn">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="info-item mb-4">
+                <h4 class="text-accent mb-3">
+                  <i class="fas fa-user-tag me-2"></i>
+                  {{ profile.user.username }}
+                </h4>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="detail-item">
+                      <span class="text-muted small">Thành viên từ:</span>
+                      <div class="fw-medium">2023</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="detail-item">
+                      <span class="text-muted small">Đơn hàng đã mua:</span>
+                      <div class="fw-medium">12</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-card mb-4 p-4 rounded-3 shadow-sm">
+                  <h5 class="d-flex align-items-center text-accent mb-4">
+                    <i class="fas fa-envelope me-3"></i>Thông tin liên hệ
+                  </h5>
+                  <dl class="row">
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">{{ profile.user.email }}</dd>
+                    
+                    <dt class="col-sm-4">Điện thoại:</dt>
+                    <dd class="col-sm-8">
+                      {% if profile.phone_number %}
+                        {{ profile.phone_number }}
+                      {% else %}
+                        <span class="text-muted">Chưa cập nhật</span>
+                      {% endif %}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="info-card mb-4 p-4 rounded-3 shadow-sm">
+                  <h5 class="d-flex align-items-center text-accent mb-4">
+                    <i class="fas fa-map-marker-alt me-3"></i>Địa chỉ
+                  </h5>
+                  <div class="address-content">
+                    {% if profile.address %}
+                      {{ profile.address|linebreaks }}
+                    {% else %}
+                      <div class="text-center text-muted py-3">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                        <p>Bạn chưa cập nhật địa chỉ</p>
+                        <a href="{% url 'update_profile' %}" class="btn btn-sm btn-custom">
+                          Thêm địa chỉ ngay
+                        </a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+  .text-accent {
+    color: var(--accent-color);
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .avatar-edit-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  .info-card {
+    background: white;
+    transition: transform 0.3s ease;
+  }
+
+  .info-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .detail-item {
+    padding: 12px;
+    background-color: rgba(255, 107, 107, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 107, 107, 0.1);
+  }
+
+  .info-item dt {
+    font-weight: 500;
+    color: var(--primary-color);
+  }
+
+  .info-item dd {
+    color: var(--text-color);
+  }
+</style>
 {% endblock %}

@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent  # Đảm bảo BASE_DIR là kiểu Path
 
 
 # Quick-start development settings - unsuitable for production
@@ -47,18 +47,19 @@ ROOT_URLCONF = 'hungnm_project1.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / "templates"],  # Đảm bảo thư mục templates được khai báo
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',  # Cần thiết cho Admin sidebar
+                'django.contrib.auth.context_processors.auth',  # Bắt buộc cho Admin
+                'django.contrib.messages.context_processors.messages',  # Bắt buộc cho Admin
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'hungnm_project1.wsgi.application'
 
@@ -68,8 +69,8 @@ WSGI_APPLICATION = 'hungnm_project1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'ecommerce_db',  # Ví dụ: 'ecommerce_db'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",  # Dùng BASE_DIR đúng cách
     }
 }
 
@@ -118,3 +119,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/customer/login/'  # Trang đăng nhập
 LOGIN_REDIRECT_URL = '/'  # Chuyển hướng sau khi đăng nhập thành công
 LOGOUT_REDIRECT_URL = '/'  # Chuyển hướng sau khi đăng xuất
+
+AUTH_USER_MODEL = 'customer.CustomUser'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'hungnm_project1/statics'), 
+    # Thêm đường dẫn đến thư mục chứa ảnh
+]

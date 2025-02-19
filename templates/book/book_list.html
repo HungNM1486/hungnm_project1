@@ -1,12 +1,192 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<h1>Danh sách sách</h1>
-<ul class="list-group">
-    {% for book in books %}
-    <li class="list-group-item">
-        <a href="{% url 'book_detail' book.pk %}">{{ book.title }}</a> - {{ book.author }} - {{ book.price }}
-    </li>
-    {% endfor %}
-</ul>
+<main class="container container-main">
+    <!-- Search and Filters Section -->
+    <div class="row mb-5 g-3">
+        <div class="col-md-8">
+            <div class="search-bar input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-secondary"></i>
+                </span>
+                <input type="text" class="form-control form-control-lg border-start-0" 
+                       placeholder="Tìm kiếm sách theo tên, tác giả hoặc thể loại...">
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-lg">
+                    <option>Sắp xếp theo</option>
+                    <option>Giá tăng dần</option>
+                    <option>Giá giảm dần</option>
+                    <option>Đánh giá cao nhất</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for book in books %}
+        <div class="col">
+            <div class="card book-card h-100 border-0 shadow-hover">
+                <div class="position-relative">
+                    <!-- Thêm liên kết cho ảnh sách -->
+                    <a href="{% url 'book_detail' book.id %}" class="text-decoration-none">
+                        <img src="{% static 'book_cover_doc.jpeg' %}" 
+                             class="card-img-top" 
+                             alt="{{ book.title }}">
+                        <div class="book-badges">
+                            <span class="badge bg-accent">Bán chạy</span>
+                            <span class="badge bg-danger">-30%</span>
+                        </div>
+                    </a>
+                    <button class="btn btn-like position-absolute top-0 end-0 m-2">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                
+                <div class="card-body pb-0">
+                    <!-- Thêm liên kết cho tiêu đề sách -->
+                    <a href="{% url 'book_detail' book.id %}" class="text-decoration-none text-dark">
+                        <h5 class="card-title text-truncate">{{ book.title }}</h5>
+                    </a>
+                    <p class="card-text text-muted small mb-1">{{ book.author }}</p>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rating-stars">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star {% if forloop.counter <= book.rating %}text-warning{% else %}text-secondary{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted ms-2">({{ book.reviews }} đánh giá)</small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="h4 text-accent">{{ book.price|floatformat:0 }}đ</span>
+                            {% if book.original_price %}
+                            <del class="text-muted small ms-2">{{ book.original_price|floatformat:0 }}đ</del>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-custom btn-sm px-3 py-2">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<style>
+    .book-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Hiệu ứng cho liên kết */
+    .book-card a:hover {
+        opacity: 0.92;
+        text-decoration: none;
+    }
+
+    .card-title {
+        transition: color 0.3s ease;
+    }
+
+    .card-title:hover {
+        color: var(--accent-color) !important;
+    }
+
+    .card-img-top {
+        height: 280px;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover .card-img-top {
+        transform: scale(1.03);
+    }
+
+    .book-badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        gap: 8px;
+        z-index: 1;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+
+    .bg-accent {
+        background: var(--accent-color) !important;
+    }
+
+    .btn-like {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2; /* Đảm bảo nút like hiển thị trên cùng */
+    }
+
+    .btn-like:hover {
+        color: var(--accent-color);
+    }
+
+    .rating-stars {
+        color: #ffd700;
+        font-size: 0.9rem;
+    }
+
+    .shadow-hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 768px) {
+        .card-img-top {
+            height: 200px;
+        }
+    }
+</style>
 {% endblock %}

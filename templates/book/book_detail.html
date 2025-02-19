@@ -1,17 +1,438 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>{{ book.title }}</h1>
-<p><strong>Tác giả:</strong> {{ book.author }}</p>
-<p><strong>Mô tả:</strong> {{ book.description }}</p>
-<p><strong>Giá:</strong> {{ book.price }}</p>
-{% if book.image %}
-    <img src="{{ book.image.url }}" alt="{{ book.title }}" style="max-width:200px;">
-{% endif %}
-<p><strong>Danh mục:</strong>
-    {% for cat in book.category.all %}
-        {{ cat.name }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-</p>
-<a href="{% url 'add_to_cart' book.id %}" class="btn btn-primary">Thêm vào giỏ hàng</a>
+<main class="container container-main">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded-3 shadow-sm">
+            <li class="breadcrumb-item">
+                <a href="{% url 'book_list' %}" class="text-decoration-none">
+                    <i class="fas fa-home me-1"></i>Trang chủ
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ book.title|truncatechars:25 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-book">
+                <div class="row g-4">
+                    <!-- Book Images -->
+                    <div class="col-md-5">
+                        <div class="book-media">
+                            <div class="main-image ratio ratio-1x1">
+                                <img src="{{ book.image.url }}" 
+                                     class="img-fluid rounded-3" 
+                                     alt="{{ book.title }}"
+                                     id="mainImage">
+                                <div class="badges-overlay">
+                                    {% if book.discount %}
+                                    <span class="badge bg-danger">-{{ book.discount }}%</span>
+                                    {% endif %}
+                                    <span class="badge bg-accent">Bán chạy</span>
+                                </div>
+                            </div>
+                            <div class="thumbnails mt-3">
+                                {% for i in "1234" %}
+                                <img src="{% static 'images/thumb_'|add:i|add:'.jpg' %}" 
+                                     class="thumbnail" 
+                                     alt="Thumbnail {{ i }}"
+                                     onclick="changeImage(this)">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Book Details -->
+                    <div class="col-md-7">
+                        <div class="p-3 p-xl-4">
+                            <!-- Title and Rating -->
+                            <h1 class="display-5 fw-bold mb-3">{{ book.title }}</h1>
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="rating-stars me-2">
+                                    {% for i in "12345" %}
+                                    <i class="fas fa-star {% if forloop.counter <= book.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">({{ book.reviews }} đánh giá)</small>
+                            </div>
+
+                            <!-- Price Section -->
+                            <div class="price-wrapper mb-4">
+                                <div class="h2 text-accent mb-2">
+                                    {{ book.price|floatformat:0 }}đ
+                                    {% if book.original_price %}
+                                    <del class="text-muted fs-5 ms-2">{{ book.original_price|floatformat:0 }}đ</del>
+                                    {% endif %}
+                                </div>
+                                <div class="text-success fs-5">
+                                    <i class="fas fa-tag me-2"></i>Tiết kiệm {{ book.savings|floatformat:0 }}đ
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons d-grid gap-3 mb-4">
+                                <button class="btn btn-lg btn-custom py-3">
+                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                </button>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-accent flex-grow-1">
+                                        <i class="far fa-heart me-2"></i>Yêu thích
+                                    </button>
+                                    <button class="btn btn-outline-accent">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Info -->
+                            <div class="quick-info border-top pt-4">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-edit text-muted me-2"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Tác giả</small>
+                                                <strong>{{ book.author }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Xuất bản</small>
+                                                <strong>{{ book.publish_date|date:"m/Y" }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-book-open text-muted me-2"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Số trang</small>
+                                                <strong>{{ book.pages }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-truck text-muted me-2"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Vận chuyển</small>
+                                                <strong>2-3 ngày</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Tabs -->
+            <div class="book-tabs mt-5">
+                <nav class="nav-tabs-wrapper">
+                    <div class="nav nav-tabs" role="tablist">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#description">
+                            <i class="fas fa-file-alt me-2"></i>Mô tả sách
+                        </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#specs">
+                            <i class="fas fa-info-circle me-2"></i>Thông số kỹ thuật
+                        </button>
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews">
+                            <i class="fas fa-comments me-2"></i>Đánh giá ({{ book.reviews }})
+                        </button>
+                    </div>
+                </nav>
+
+                <div class="tab-content p-4 shadow-sm rounded-bottom">
+                    <!-- Description Tab -->
+                    <div class="tab-pane fade show active" id="description">
+                        <div class="prose">
+                            {{ book.description|linebreaks }}
+                        </div>
+                        <div class="mt-4">
+                            <h5 class="mb-3">Đặc điểm nổi bật</h5>
+                            <ul class="feature-list">
+                                <li>Bản in chất lượng cao</li>
+                                <li>Giấy không chứa axit</li>
+                                <li>Bìa cứng bảo vệ tốt</li>
+                                <li>Kèm bookmark độc quyền</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Specifications Tab -->
+                    <div class="tab-pane fade" id="specs">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <dl class="specs-list">
+                                    <div class="spec-item">
+                                        <dt>Nhà xuất bản</dt>
+                                        <dd>{{ book.publisher }}</dd>
+                                    </div>
+                                    <div class="spec-item">
+                                        <dt>Ngôn ngữ</dt>
+                                        <dd>{{ book.language }}</dd>
+                                    </div>
+                                    <div class="spec-item">
+                                        <dt>ISBN</dt>
+                                        <dd>{{ book.isbn }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="specs-list">
+                                    <div class="spec-item">
+                                        <dt>Kích thước</dt>
+                                        <dd>14 x 21 cm</dd>
+                                    </div>
+                                    <div class="spec-item">
+                                        <dt>Trọng lượng</dt>
+                                        <dd>450g</dd>
+                                    </div>
+                                    <div class="spec-item">
+                                        <dt>Loại bìa</dt>
+                                        <dd>Bìa mềm</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews">
+                        <div class="review-section">
+                            <div class="row g-4">
+                                {% for review in book.review_set.all %}
+                                <div class="col-12">
+                                    <div class="review-card p-4 rounded-3 shadow-sm">
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <div class="rating-stars small">
+                                                {% for i in "12345" %}
+                                                <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                                {% endfor %}
+                                            </div>
+                                            <small class="text-muted">{{ review.created_at|date:"d/m/Y" }}</small>
+                                        </div>
+                                        <p class="mb-0">{{ review.comment }}</p>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-5">
+                                    <i class="fas fa-comment-slash fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted">Chưa có đánh giá nào</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="sticky-sidebar">
+                <!-- Related Books -->
+                <div class="related-books mb-5">
+                    <h3 class="h4 mb-4">Sách cùng thể loại</h3>
+                    <div class="row g-3">
+                        {% for related in related_books %}
+                        <div class="col-12">
+                            <a href="{% url 'book_detail' related.id %}" 
+                               class="related-item d-flex gap-3 text-decoration-none">
+                                <img src="{{ related.image.url }}" 
+                                     class="rounded-2" 
+                                     alt="{{ related.title }}"
+                                     width="80">
+                                <div class="flex-grow-1">
+                                    <h4 class="h6 mb-1">{{ related.title|truncatechars:35 }}</h4>
+                                    <p class="small text-muted mb-1">{{ related.author }}</p>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="text-accent">{{ related.price|floatformat:0 }}đ</span>
+                                        <div class="rating-stars xsmall">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star {% if forloop.counter <= related.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Shipping Info -->
+                <div class="shipping-info bg-accent-light p-4 rounded-3">
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="icon-wrapper bg-accent text-white">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <h4 class="h5 mb-2">Giao hàng siêu tốc</h4>
+                            <p class="small mb-0">Nhận hàng trong 2h tại Hà Nội và TP.HCM</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="icon-wrapper bg-success text-white">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div>
+                            <h4 class="h5 mb-2">Hỗ trợ 24/7</h4>
+                            <p class="small mb-0">Hotline: 1900 1234</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .shadow-book {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+    }
+
+    .breadcrumb {
+        background: rgba(255, 107, 107, 0.05);
+        border: 1px solid rgba(255, 107, 107, 0.1);
+    }
+
+    .main-image {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .badges-overlay {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+
+    .thumbnails {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .thumbnail:hover {
+        border-color: var(--accent-color);
+        transform: translateY(-3px);
+    }
+
+    .rating-stars {
+        color: #ffd700;
+    }
+
+    .rating-stars.xsmall {
+        font-size: 0.75rem;
+    }
+
+    .price-wrapper {
+        background: rgba(255, 107, 107, 0.03);
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .action-buttons .btn {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs-wrapper {
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: var(--text-color);
+        padding: 1rem 2rem;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .review-card {
+        background: rgba(255, 107, 107, 0.03);
+        border: 1px solid rgba(255, 107, 107, 0.1);
+    }
+
+    .related-item {
+        transition: transform 0.3s ease;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .related-item:hover {
+        transform: translateX(5px);
+        background: rgba(0, 0, 0, 0.02);
+    }
+
+    .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .bg-accent-light {
+        background: rgba(255, 107, 107, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .main-image {
+            height: 350px;
+        }
+
+        .nav-tabs .nav-link {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<script>
+    function changeImage(element) {
+        document.getElementById('mainImage').src = element.src;
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.style.borderColor = 'transparent';
+        });
+        element.style.borderColor = 'var(--accent-color)';
+    }
+</script>
 {% endblock %}

@@ -1,0 +1,33 @@
+1️⃣ Dịch vụ Quản lý Người dùng (Customer Service)
+📌 Chức năng chính: Quản lý thông tin người dùng, đăng ký, đăng nhập, phân quyền
+
+Tính năng	Mô tả
+🔐 Xác thực & Phân quyền	Dùng JWT cho xác thực API, hỗ trợ Admin, Customer
+📧 Xác thực Email	Người dùng nhận email kích hoạt khi đăng ký
+🔑 Quên mật khẩu / Đổi mật khẩu	Hỗ trợ reset mật khẩu qua email
+📋 Hồ sơ người dùng	Người dùng cập nhật thông tin cá nhân, địa chỉ giao hàng
+🎁 Hệ thống thành viên VIP	Cấp độ VIP theo số tiền đã chi tiêu để nhận ưu đãi
+🛠 Công nghệ: Django REST Framework (DRF) + PostgreSQL
+
+2️⃣ Dịch vụ Danh mục Sản phẩm (Book Service)
+📌 Chức năng chính: Quản lý danh mục sách, tìm kiếm, gợi ý sách
+
+Tính năng	Mô tả
+📚 Danh mục sách	Quản lý thông tin sách (tên, tác giả, giá, mô tả, hình ảnh)
+🔍 Tìm kiếm nâng cao	Tìm kiếm theo tên sách, tác giả, thể loại, dùng Elasticsearch
+🎯 Gợi ý sách thông minh	Gợi ý sách dựa trên sách đã xem, đã mua, đã thích
+🛒 Xem nhanh sản phẩm	Popup hiển thị thông tin sách mà không cần vào trang chi tiết
+⭐ Đánh giá & Nhận xét	Cho phép người dùng đánh giá (rating), bình luận
+🛠 Công nghệ: Django REST Framework + Elasticsearch + MongoDB (lưu metadata sách)
+
+3️⃣ Dịch vụ Giỏ hàng & Đơn hàng (Cart & Order Service)
+📌 Chức năng chính: Quản lý giỏ hàng, đặt hàng, thanh toán
+
+Tính năng	Mô tả
+🛒 Quản lý giỏ hàng	Thêm/xóa/cập nhật sản phẩm trong giỏ
+🎟 Áp dụng mã giảm giá	Hỗ trợ nhập mã giảm giá (Voucher)
+💳 Thanh toán online	Tích hợp VNPay, Momo, PayPal, Stripe
+🚚 Quản lý đơn hàng	Người dùng xem lịch sử đơn hàng, trạng thái đơn hàng
+📦 Theo dõi giao hàng	Liên kết với dịch vụ vận chuyển (GHTK, GHN, VNPost)
+📧 Thông báo đơn hàng	Gửi email/sms khi đặt hàng, xác nhận, giao hàng
+🛠 Công nghệ: Django REST Framework + Redis (cache giỏ hàng) + Celery (xử lý đơn hàng)
