@@ -1,5 +1,4 @@
 altgraph==0.17.4
-asgiref @ file:///croot/asgiref_1724072470684/work
 cffi==1.17.1
 cryptography==44.0.1
 Django==3.1.12
