@@ -30,7 +30,10 @@ class CartView(generics.RetrieveAPIView):
 
 
 # API: Lấy thông tin giỏ hàng
-class CartAPIView(LoginRequiredMixin, APIView):
+
+class CartAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Đảm bảo chỉ có user đã đăng nhập mới truy cập được
+
     def get(self, request):
         profile = get_object_or_404(CustomerProfile, user=request.user)
         cart, _ = Cart.objects.get_or_create(customer=profile)
