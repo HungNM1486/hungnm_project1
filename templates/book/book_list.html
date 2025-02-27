@@ -73,9 +73,14 @@
                             <del class="text-muted small ms-2">{{ book.original_price|floatformat:0 }}đ</del>
                             {% endif %}
                         </div>
-                        <button class="btn btn-custom btn-sm px-3 py-2">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
+                        
+                        <form method="GET" action="{% url 'add_to_cart' book.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-custom btn-sm px-3 py-2">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>

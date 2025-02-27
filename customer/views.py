@@ -1,8 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 from customer.models import CustomerProfile
 from customer.forms import RegisterForm, LoginForm, CustomerProfileForm
+from customer.serializers import UserSerializer, CustomerProfileSerializer
+
+# ================= GIAO DIỆN WEB ==================
 
 def register_view(request):
     if request.method == "POST":
@@ -37,7 +47,6 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    # Sử dụng get_or_create để lấy CustomerProfile, nếu chưa có thì tạo mới
     profile, created = CustomerProfile.objects.get_or_create(user=request.user)
     if request.method == "POST":
         form = CustomerProfileForm(request.POST, instance=profile)
@@ -48,7 +57,6 @@ def profile_view(request):
         form = CustomerProfileForm(instance=profile)
     return render(request, "customer/profile.html", {"form": form, "profile": profile})
 
-
 @login_required
 def update_profile(request):
     profile = CustomerProfile.objects.get(user=request.user)
@@ -56,7 +64,50 @@ def update_profile(request):
         form = CustomerProfileForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect("profile")  # Chuyển hướng về trang hồ sơ cá nhân sau cập nhật
+            return redirect("profile")
     else:
         form = CustomerProfileForm(instance=profile)
     return render(request, "customer/update_profile.html", {"form": form})
+
+# ================= API (JSON) ==================
+
+# API Đăng ký
+# class APIRegisterView(generics.CreateAPIView):
+#     queryset = get_user_model().objects.all()
+#     serializer_class = UserSerializer
+    
+from rest_framework.permissions import AllowAny
+    
+class APIRegisterView(generics.CreateAPIView):
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]  # 🌟 Cho phép tất cả người dùng gọi API
+
+
+# API Đăng nhập
+class APILoginView(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(username=username, password=password)
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
+
+# API Đăng xuất
+class APILogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        request.auth.delete()  # Xóa token
+        return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
+
+# API Hồ sơ cá nhân
+class APIProfileView(generics.RetrieveUpdateAPIView):
+    queryset = CustomerProfile.objects.all()
+    serializer_class = CustomerProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.customerprofile

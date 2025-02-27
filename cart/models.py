@@ -29,8 +29,7 @@ class Cart(models.Model):
             pass
 
     def get_total(self):
-        # Chuyển đổi book.price từ Decimal128 (MongoDB) sang Decimal (Python)
-        return sum(item.quantity * Decimal(item.book.price.to_decimal()) for item in self.cartitem_set.all())
+        return sum(item.quantity * item.book.price for item in self.cartitem_set.all())
 
     def clear(self):
         self.cartitem_set.all().delete()

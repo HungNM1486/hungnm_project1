@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect
 from .forms import BookForm
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from rest_framework import viewsets, generics
+from .models import Book
+from .serializers import BookSerializer
 
 class BookListView(ListView):
     model = Book
@@ -15,12 +18,18 @@ class BookDetailView(DetailView):
     template_name = 'book/book_detail.html'
     context_object_name = 'book'
 
+class APIBookListView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class APIBookDetailView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
 @login_required
 def add_book(request):
-    # Chỉ cho phép admin (hoặc staff) thêm sách
+    # Chỉ cho phép admin
     if not request.user.is_staff:
-        # Bạn có thể chuyển hướng đến trang khác hoặc trả về thông báo lỗi
         return HttpResponseForbidden("Bạn không có quyền thêm sách.")
 
     if request.method == "POST":
